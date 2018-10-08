@@ -47,7 +47,11 @@ public class CMessageService extends UnicastRemoteObject implements IMessageServ
     public static void main(String[] args) {
         try {
             IMessageService messageService = new CMessageService();
-            Registry registry = LocateRegistry.getRegistry();
+            Registry registry;
+            registry = LocateRegistry.createRegistry(1099);
+            if(null == registry) {
+                registry = LocateRegistry.getRegistry();
+            }
             registry.rebind(IMessageService.REGISTRY_IDENTIFIER, messageService);
             System.out.println("Server initialized.");
             /* timeout loop */
