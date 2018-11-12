@@ -1,6 +1,7 @@
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.ExportException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -47,18 +48,24 @@ public class CMessageService extends UnicastRemoteObject implements IMessageServ
     public static void main(String[] args) {
         try {
             IMessageService messageService = new CMessageService();
-            Registry registry;
-            registry = LocateRegistry.createRegistry(1099);
-            if(null == registry) {
-                registry = LocateRegistry.getRegistry();
+            Registry registry = null;
+            try {
+                registry = LocateRegistry.createRegistry(1099);
+                System.err.println("Created registry");
+            }
+            catch (ExportException ee) {
+                if(null == registry) {
+                    registry = LocateRegistry.getRegistry();
+                    System.err.println("Connected to running registry");
+                }
             }
             registry.rebind(IMessageService.REGISTRY_IDENTIFIER, messageService);
             System.out.println("Server initialized.");
             /* timeout loop */
             while(true) {
-                // TODO implement timeout logic here
                 TimeUnit.MILLISECONDS.sleep(TIMEOUT_MS);
-                for(String key : clientDictionary.keySet()) {
+                Set<String> keys = clientDictionary.keySet();
+                for(String key : keys) {
                     if(System.currentTimeMillis()-clientDictionary.get(key).lastAccess > TIMEOUT_MS) {
                         clientDictionary.remove(key);
                         System.out.println("Dropping message queue for " + key);

@@ -1,0 +1,6 @@
+[submodule "lab2/actor-framework"]
+	path = lab2/actor-framework
+	url = https://github.com/actor-framework/actor-framework.git
+[submodule "lab2/vslab-caf"]
+	path = lab2/vslab-caf
+	url = https://github.com/inetrg/vslab-caf.git
